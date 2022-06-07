@@ -174,6 +174,7 @@
 %define with_zfs_arc 0%{!?_without_zfs_arc:1}
 %define with_zookeeper 0%{!?_without_zookeeper:1}
 %define with_mdevents 0%{!?_without_mdevents:1}
+%define with_infiniband 0%{!?_without_infiniband:1}
 
 # DDN plugins
 %define with_filedata 0%{!?_without_filedata:1}
@@ -188,6 +189,8 @@
 # Plugins not built by default because of dependencies on libraries not
 # available in RHEL or EPEL:
 
+# plugin netstat_udp disabled, currently NetBSD-only
+%define with_netstat_udp 0%{!?_without_netstat_udp:0}
 # plugin apple_sensors disabled, requires a Mac
 %define with_apple_sensors 0%{!?_without_apple_sensors:0}
 # plugin aquaero disabled, requires a libaquaero5
@@ -284,10 +287,10 @@
 
 Summary:	Statistics collection and monitoring daemon
 Name:		collectd
-Version:        5.11.0.g%{?rev}.ddn
+Version:        5.12.0.146
 Release:	1%{?dist}
 URL:		https://collectd.org
-Source:		https://collectd.org/files/%{name}-%{version}.tar.bz2
+Source:         https://collectd.org/files/%{name}-%{version}.tar.bz2
 License:	GPLv2
 Group:		System Environment/Daemons
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
@@ -1210,6 +1213,12 @@ The zabbix plugin send key and value to zabbix server
 %define _with_apcups --enable-apcups
 %else
 %define _with_apcups --disable-apcups
+%endif
+
+%if %{with_netstat_udp}
+%define _with_netstat_udp --enable-netstat_udp
+%else
+%define _with_netstat_udp --disable-netstat_udp
 %endif
 
 %if %{with_apple_sensors}
@@ -2148,6 +2157,12 @@ The zabbix plugin send key and value to zabbix server
 %define _with_mdevents --disable-mdevents
 %endif
 
+%if %{with_infiniband}
+%define _with_infiniband --enable-infiniband
+%else
+%define _with_infiniband --disable-infiniband
+%endif
+
 # DDN Plugins
 %if %{with_ganglia}
 %define _with_ganglia --enable-ganglia
@@ -2223,6 +2238,7 @@ The zabbix plugin send key and value to zabbix server
 	%{?_with_amqp1} \
 	%{?_with_apache} \
 	%{?_with_apcups} \
+        %{?_with_netstat_udp} \
 	%{?_with_apple_sensors} \
 	%{?_with_aquaero} \
 	%{?_with_ascent} \
@@ -2739,6 +2755,9 @@ fi
 %endif
 %if %{with_mdevents}
 %{_libdir}/%{name}/mdevents.so
+%endif
+%if %{with_infiniband}
+%{_libdir}/%{name}/infiniband.so
 %endif
 
 #TODO put those in separate packages

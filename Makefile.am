@@ -2600,4 +2600,27 @@ generic-jmx.jar: $(JAVA_TIMESTAMP_FILE)
 
 jar_DATA = collectd-api.jar generic-jmx.jar
 endif
+rpm-local:
+	$(MKDIR_P) $(rpmbuilddir)/SOURCES
+
+SPEC_FILE = contrib/redhat/@PACKAGE_TARNAME@.spec
+rpms: $(SPEC_FILE) dist Makefile
+	rpmbuilddir=`mktemp -t -d rpmbuild-@PACKAGE@-$$USER-XXXXXXXX`; \
+	echo $(AM_MAKEFLAGS); \
+	make $(AM_MAKEFLAGS) \
+		rpmbuilddir="$$rpmbuilddir" rpm-local || exit 1; \
+	cp $(distdir).tar.bz2 $$rpmbuilddir/SOURCES; \
+	rpmbuild \
+		--define "_tmppath $$rpmbuilddir/TMP" \
+		--define "_topdir $$rpmbuilddir" \
+		--define="dist .el7" \
+		-ba --with write_tsdb --with nfs --without java \
+		--without amqp --without gmond --without nut --without pinba \
+		--without ping --without varnish --without dpdkstat \
+		--without turbostat --without redis --without write_redis \
+		--without gps --without lvm --without modbus --without mysql \
+		--without ime \
+		$(SPEC_FILE) || exit 1; \
+	cp $$rpmbuilddir/RPMS/x86_64/*.rpm $(top_srcdir) || exit 1; \
+	rm -rf $$rpmbuilddir
 
