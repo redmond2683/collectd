@@ -2606,7 +2606,6 @@ rpm-local:
 SPEC_FILE = contrib/redhat/@PACKAGE_TARNAME@.spec
 rpms: $(SPEC_FILE) dist Makefile
 	rpmbuilddir=`mktemp -t -d rpmbuild-@PACKAGE@-$$USER-XXXXXXXX`; \
-	echo $(AM_MAKEFLAGS); \
 	make $(AM_MAKEFLAGS) \
 		rpmbuilddir="$$rpmbuilddir" rpm-local || exit 1; \
 	cp $(distdir).tar.bz2 $$rpmbuilddir/SOURCES; \
