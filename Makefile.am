@@ -2609,10 +2609,11 @@ rpms: $(SPEC_FILE) dist Makefile
 	make $(AM_MAKEFLAGS) \
 		rpmbuilddir="$$rpmbuilddir" rpm-local || exit 1; \
 	cp $(distdir).tar.bz2 $$rpmbuilddir/SOURCES; \
+	versionnum=`cat /etc/redhat-release|awk -F'[ .]' '{print $$4}'`; \
 	rpmbuild \
 		--define "_tmppath $$rpmbuilddir/TMP" \
 		--define "_topdir $$rpmbuilddir" \
-		--define="dist .el7" \
+		--define="dist .el$$versionnum" \
 		-ba --with write_tsdb --with nfs --without java \
 		--without amqp --without gmond --without nut --without pinba \
 		--without ping --without varnish --without dpdkstat \
