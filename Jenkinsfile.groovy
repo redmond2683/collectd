@@ -6,6 +6,7 @@ def xml_definition=''
 pipeline {
     agent any
     environment {
+        HOME_DIR="/var/lib/jenkins"
         COLLECTD_DIR="collectd"
         COLLECTD_REPO="git@github.com:redmond2683/collectd.git"
         XML_DEFINITION_DIR="xml_definition"
@@ -14,6 +15,13 @@ pipeline {
         TEST_DIR="/var/lib/jenkins/work"
     }
     stages {
+        stage('Prepare') {
+            steps {
+                dir(HOME_DIR) {
+                    sh './cleanup.sh'
+                }
+            }
+        }
         stage('Build') {
             steps {
                 dir(COLLECTD_DIR) {
@@ -62,8 +70,14 @@ pipeline {
         }
         stage('Test') {
             steps {
+                dir(HOME_DIR) {
+                    sh './initdb.sh'
+                }
                 dir(TEST_DIR) {
                     sh 'python verify_metrics.py -d /var/lib/jenkins/work -f /etc/lustre-b_es5_2.xml -t tests.xml -c ./collectd.conf'
+                }
+                dir(HOME_DIR) {
+                    sh 'check_tsdb_test_results.sh'
                 }
             }
         }
