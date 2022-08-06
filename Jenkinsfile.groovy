@@ -91,7 +91,7 @@ pipeline {
             }
             steps {
                 dir(COLLECTD_DIR) {
-                    sh './publish.sh $GITHUB_TOKEN feature/jenkinscd redmond2683/collectd.git'
+                    sh './publish.sh $GITHUB_TOKEN feature/jenkinscd redmond2683/collectd'
                 }
             }
         }
